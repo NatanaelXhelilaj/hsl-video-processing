@@ -27,13 +27,13 @@ class ProcessVideo(Resource):
             return "Not allowed", 401
 
         video = ffmpeg_streaming.input(
-            'http://192.168.0.177:3000/tempVideo/' + token + '/' + videoName)
+            'https://mediapilot.io/tempVideo/' + token + '/' + videoName)
         hls = video.hls(Formats.h264())
         hls.auto_generate_representations()
         videoNameNoExt = videoName.split('.')[0]
 
         try:
-            hls.output(os.path.join(sys.path[1], videoNameNoExt, videoNameNoExt), monitor=monitor)
+            hls.output(os.path.join('video-space-DO-mount', videoNameNoExt, videoNameNoExt), monitor=monitor)
         except:
             return "Internal server error", 500
 
@@ -43,4 +43,5 @@ class ProcessVideo(Resource):
 api.add_resource(ProcessVideo, '/videoProcessing/<token>/<videoName>')
 
 if __name__ == '__main__':
-    app.run()
+    from waitress import serve
+    serve(app, host="0.0.0.0", port=5001)
